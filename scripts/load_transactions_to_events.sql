@@ -129,6 +129,7 @@ WITH choose_transaction AS (
         end_day,
         event
     FROM cumulative
+    WHERE start_day >= 1 AND end_day > start_day
 )
 INSERT INTO events (
     member_id,

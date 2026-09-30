@@ -24,7 +24,11 @@ SELECT
     registration_method,
     registration_date,
     CASE WHEN age > 0 AND age <= 111 AND gender IS NOT NULL THEN TRUE ELSE FALSE END,
-    EXTRACT(EPOCH FROM ('2015-01-01 00:00:00' - registration_date + INTERVAL '1 day')) / 60 / 60 / 24,
+    CASE 
+        WHEN EXTRACT(EPOCH FROM ('2015-01-01 00:00:00' - registration_date + INTERVAL '1 day')) / 60 / 60 / 24 >= 1 
+        THEN EXTRACT(EPOCH FROM ('2015-01-01 00:00:00' - registration_date + INTERVAL '1 day')) / 60 / 60 / 24 
+        ELSE 1
+    END,
     EXTRACT(EPOCH FROM ('2017-03-31 00:00:00' - registration_date + INTERVAL '1 day')) / 60 / 60 / 24
 FROM members_staging 
 WHERE registration_date < '2017-03-31 00:00:00';

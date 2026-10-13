@@ -1,6 +1,6 @@
 ---
 format: 
-  html:
+  gfm:
     page-layout: full
 ---
 
@@ -96,6 +96,8 @@ ggsurvplot(km_fit,
            ggtheme = theme_minimal())
 ```
 
+Stratifying by pricing tier. It is shown that the higher the price, the lower the associated retention rate.
+
 ```{r}
 km_price <- surv_fit(surv_obj ~ 1 + pricing_tier, data = df)
 
@@ -115,6 +117,8 @@ ggsurvplot(km_price,
            ylab = 'Retention Rate',
            ggtheme = theme_minimal())
 ```
+
+Stratifying by city. City 1 is associated with a higher retention rate than the other cities, whereas the retention rates of the other cities are similar to each other.
 
 ```{r}
 
@@ -154,6 +158,30 @@ plot(cox.zph(cox_fit))
 
 ### Results
 
+The pricing tier effects are significant but not the city effects, except for the marginally significant effect of city 13. Looking at the interaction effects, the only significant one is the 149 tier in city 13. The churn risk associated with the 149 tier is 1.6665 times that of the 129 tier, and the risk associated with the 99 tier is 0.2061 times that of the 129 tier. The churn risk of 149 has 0.7807 times the effect on city 13 compared to city 1.
+
 ```{r}
 summary(cox_fit)
+```
+
+Predicting the median survival times of each tier in city 1. It is not worth increasing the price to 149 as the churn risk outweighs the extra revenue.
+
+```{r}
+survfit(
+  cox_fit, 
+  newdata = data.frame(
+    pricing_tier = c('99', '129', '149'), 
+    city = '1')
+)
+```
+
+Even in city 13, the churn risk just barely surpasses the extra revenue.
+
+```{r}
+survfit(
+  cox_fit, 
+  newdata = data.frame(
+    pricing_tier = c('99', '129', '149'), 
+    city = '13')
+)
 ```

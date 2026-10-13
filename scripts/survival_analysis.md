@@ -217,9 +217,11 @@ ggsurvplot(km_city,
 A Cox Proportional Hazards Model is used, with the price and city as
 covariates. An interaction between them is also introduced.
 
-$
-h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr] 
-$
+$$
+\begin{equation*}
+    h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr] 
+\end{equation*}
+$$
 
 Plotting the Schoenfeld residuals against time, it can be seen that all
 the residuals stay relatively constant up till 365 days. That means that

@@ -219,7 +219,7 @@ covariates. An interaction between them is also introduced.
 
 $$
 \begin{equation*}
-    h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr] 
+    h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\mathrm{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\mathrm{pricing\_tier}\cdot\text{city})\bigr] 
 \end{equation*}
 $$
 

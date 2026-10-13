@@ -98,26 +98,26 @@ head(df)
 ```
 
                                          member_id  city registration_method
-    1 L7azQO//LYkNHq+DSQwX54KRUXozzt1/k964QsrUMGY=     1                   7
-    2 FjEZAhwFky8sWoaNGTp+p/r3/hH30WxLr396iSho3gs=     1                   7
-    3 qXxE3odHgZYlGv0FaMe0LfTAzEaH6vUlUYYAmFaAE5Q= OTHER                   3
-    4 Dmi763cEG1EpR+GGFZx37woAS/3N1VZ6TYyCHt4iYm0= OTHER                   7
-    5 R8xs0UUq6j2zOM7zhSEL5z8ac9MIlNkGakKpzXK+JFQ=     1                   7
-    6 9eoVMtsXwWvmDtvBHzLTV5gegf59sdeuTvdbhnl77nk=     1               OTHER
+    1 09O57iWznPC13qytGs69JBEyqvWafKI5LeUrHnyzcds=     1                   7
+    2 QuSd6narKNZ/nHBMl8z6PLIhpPUMyh1LeVvRvUmokg0= OTHER                   9
+    3 QuSd6narKNZ/nHBMl8z6PLIhpPUMyh1LeVvRvUmokg0= OTHER                   9
+    4 zH13n5erjMtC3KDv6d9uwGkRAQGQKeGv0SCEQRAbwzY=     1                   7
+    5 uQIsnvanLl/ELREuh9k7U2aXa6gPeIhF4DdQWYzWSiM=     1                   7
+    6 m41u/JQydyympt1XLETp2X0kgvGDKjNToRf4yA4qWHc= OTHER                   9
       is_complete_age_gender tenure_id avg_price start_day end_day event
-    1                  FALSE         0        99         1     378 FALSE
-    2                  FALSE         0        99         1      97 FALSE
-    3                   TRUE         0       149       343     373  TRUE
-    4                   TRUE         0       149         1      89  TRUE
-    5                  FALSE         0       149         1      98 FALSE
-    6                  FALSE         0       129         1      95 FALSE
+    1                  FALSE         0       149         1     595 FALSE
+    2                   TRUE         1       149       515     585 FALSE
+    3                   TRUE         0       149        20      80  TRUE
+    4                  FALSE         0        99         1     488  TRUE
+    5                  FALSE         0       149         1     589 FALSE
+    6                   TRUE         2       149       573     586 FALSE
       pricing_tier
-    1           99
-    2           99
+    1          149
+    2          149
     3          149
-    4          149
+    4           99
     5          149
-    6          129
+    6          149
 
 ### Kaplan-Meier Curves
 
@@ -217,9 +217,7 @@ ggsurvplot(km_city,
 A Cox Proportional Hazards Model is used, with the price and city as
 covariates. An interaction between them is also introduced.
 
-$$
-h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr]
-$$
+$$ h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr] $$
 
 Plotting the Schoenfeld residuals against time, it can be seen that all
 the residuals stay relatively constant up till 365 days. That means that

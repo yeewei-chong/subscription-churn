@@ -1,0 +1,159 @@
+---
+format: 
+  html:
+    page-layout: full
+---
+
+# Churn Analysis
+
+### Loading Packages & Connecting to the Database
+
+```{r}
+library(dplyr)
+library(ggplot2)
+# for database connection
+library(RPostgres)
+library(DBI)
+# for survival analysis
+library(survival)
+library(survminer)
+
+# edit these
+DB_NAME <- 'subscription_churn'
+DB_USER <- 'postgres'
+DB_PASS <- 'postgres'
+DB_HOST <- 'localhost'
+DB_PORT <- '5432'
+
+con <- dbConnect(Postgres(),
+                 host = DB_HOST,
+                 port = DB_PORT,
+                 dbname = DB_NAME,
+                 user = DB_USER,
+                 password = DB_PASS)
+
+dbListTables(con)
+```
+
+### Loading Data
+
+Joining the members and events tables, using data in or after 2015. Low-frequency cities and registration methods are grouped under OTHER. The three most popular tiers, namely NT\\\\\$99, NT\\\\\$129, and NT\\\\\$149, are chosen to compare.
+
+```{r}
+df <-dbGetQuery(con, "
+  SELECT 
+      events.member_id,
+      city, 
+      registration_method, 
+      is_complete_age_gender, 
+      tenure_id, 
+      avg_price, 
+      start_day, 
+      end_day,
+      event
+  FROM events
+  INNER JOIN members
+  ON events.member_id = members.member_id
+  WHERE avg_price IN (99, 129, 149)
+    AND registration_date >= '2015-01-01 00:00:00';
+"
+) %>%
+  add_count(city, name = 'city_count') %>%
+  add_count(registration_method, name = 'regis_count') %>%
+  dplyr::mutate(
+    city = if_else(city_count/n() < 0.05,
+                   "OTHER",
+                   city),
+    registration_method = if_else(regis_count/n() < 0.05,
+                                  "OTHER",
+                                  registration_method),
+    pricing_tier = as.character(avg_price)
+  ) %>%
+  select(-city_count, -regis_count)
+head(df)
+```
+
+### Kaplan-Meier Curves
+
+```{r}
+surv_obj <- Surv(time = df$start_day,
+                 time2 = df$end_day, 
+                 event = df$event)
+
+km_fit <- surv_fit(surv_obj ~ 1, data = df)
+
+ggsurvplot(km_fit,
+           conf.int = TRUE,
+           risk.table = TRUE,
+           linewidth = 0.1,
+           censor.size = 0,
+           break.time.by = 360,
+           surv.plot.height = 1,
+           risk.table.height = 0.3,
+           risk.table.fontsize = 2,
+           xlab = 'Subscription Tenure (Days)',
+           ylab = 'Retention Rate',
+           ggtheme = theme_minimal())
+```
+
+```{r}
+km_price <- surv_fit(surv_obj ~ 1 + pricing_tier, data = df)
+
+names(km_price$strata) <- gsub("pricing_tier=", "", names(km_price$strata))
+
+ggsurvplot(km_price,
+           conf.int = TRUE,
+           risk.table = TRUE,
+           linewidth = 0.1,
+           censor.size = 0,
+           break.time.by = 360,
+           surv.plot.height = 1,
+           risk.table.height = 0.4,
+           risk.table.fontsize = 2,
+           legend.title = 'Pricing Tier',
+           xlab = 'Subscription Tenure (Days)',
+           ylab = 'Retention Rate',
+           ggtheme = theme_minimal())
+```
+
+```{r}
+
+km_city <- surv_fit(surv_obj ~ 1 + city, data = df)
+
+names(km_city$strata) <- gsub("city=", "", names(km_city$strata))
+
+ggsurvplot(km_city,
+           conf.int = TRUE,
+           risk.table = TRUE,
+           linewidth = 0.1,
+           censor.size = 0,
+           break.time.by = 360,
+           surv.plot.height = 1,
+           risk.table.height = 0.5,
+           risk.table.fontsize = 2,
+           legend.title = 'City',
+           xlab = 'Subscription Tenure (Days)',
+           ylab = 'Retention Rate',
+           ggtheme = theme_minimal())
+```
+
+### The Model
+
+A Cox Proportional Hazards Model is used, with the price and city as covariates. An interaction between them is also introduced.
+
+$$
+h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr]
+$$
+
+Plotting the Schoenfeld residuals against time, it can be seen that all the residuals stay relatively constant up till 365 days. That means that there is no evidence against the proportional hazards assumption for short term predictions.
+
+```{r}
+cox_fit <- coxph(surv_obj ~ pricing_tier*city, data = df)
+plot(cox.zph(cox_fit))
+```
+
+### Results
+
+```{r}
+summary(cox_fit)
+```

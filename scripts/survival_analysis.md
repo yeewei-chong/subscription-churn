@@ -218,9 +218,7 @@ A Cox Proportional Hazards Model is used, with the price and city as
 covariates. An interaction between them is also introduced.
 
 $$
-\begin{equation*}
-    h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\mathrm{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\mathrm{pricing\_tier}\cdot\text{city})\bigr] 
-\end{equation*}
+h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\mathrm{pricing}\mathrm{\_}\mathrm{tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\mathrm{pricing}\mathrm{\_}\mathrm{tier}\cdot\text{city})\bigr]
 $$
 
 Plotting the Schoenfeld residuals against time, it can be seen that all

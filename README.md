@@ -12,9 +12,9 @@ This survival analysis project comparing the churn behaviours of different subsc
 
 
 ### **Model**
-$$
+```math
 h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr]
-$$
+```
 where
 
 

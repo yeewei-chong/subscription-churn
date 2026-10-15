@@ -2,6 +2,9 @@
 
 This survival analysis project comparing the churn behaviours of different subscription tiers uses the raw datasets from the WSDM 2017 KKBox's Churn Prediction Challenge (link: https://www.kaggle.com/competitions/kkbox-churn-prediction-challenge/data), namely members_v3.csv for member data, and transactions.csv and transactions_v2.csv for transaction data. 
 
+### **Problem**
+Does a higher premium on a subscription tier increase the churn risk of a member? If so, does the overall increase in revenue outweigh the churn risk? 
+
 ### **Key Results**
 - The NT\\$99 tier was associated with a 79.39% lower churn risk compared to the NT\\$129 tier, 95% CI: (-80.05%, -78.69%), significance $\approx$ 0.00.
 - The NT\\$129 tier was associated with a 39.99% lower churn risk compared to the NT\\$149 tier, 95% CI: (-41.89%, -38.03%), significance $\approx$ 0.00.
@@ -13,10 +16,16 @@ This survival analysis project comparing the churn behaviours of different subsc
 
 ### **Model**
 $$
-h(t) = h_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr]
+\lambda(t) = \lambda_0(t)\cdot\exp\bigl[\beta_1\cdot\text{pricing\_tier} + \beta_2\cdot\text{city} + \beta_3\cdot(\text{pricing\_tier}\cdot\text{city})\bigr]
 $$
 where
 
+- $\lambda(t)$ is the hazard of a member per tenure while they are still subscribed.
+- $\lambda_0(t)$ is the baseline hazard for all members.
+- pricing\_tier is the tier the member is subscribed to, NT\\$99, NT\\$129, or NT\\$149.
+- city is the city where the user first registered at.
 
 ### **Overview**
 The data was validated and loaded into a PostgreSQL database before event variables were derived using CTE and window functions. Finally, customer churn risk was analysed using Kaplan-Meier curves and a Cox Proportional Hazards model in R.
+
+Only transactions within the transaction window were chosen to analyse the behavious of the most recent customers. The 3 tiers were chosen as they are the 3 most common tiers, accounting for over 66% of the user base.
